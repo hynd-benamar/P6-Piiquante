@@ -25,3 +25,11 @@ Exigences de sécurité
 
 _______________________________________________________________________________________________________________________________________________________________________
 
+
+Lancer l'application
+
+1. Clonez le repository du projet pour obtenir la partie Frontend
+2. Ouvrez un terminal (Linux/Mac) ou une invite de commande/PowerShell (Windows) 
+3. Exécutez npm install à partir du répertoire du projet 
+4. Exécutez npm run start 
+5. Demarrez le back-end sur http://localhost:3000 seulement 
