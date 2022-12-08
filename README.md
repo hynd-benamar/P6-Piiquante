@@ -25,6 +25,13 @@ Exigences de sécurité
 
 _______________________________________________________________________________________________________________________________________________________________________
 
+Prérequis du backend
+
+- NodeJs doit être installé en local
+- Connecter MongoDB database à l'API via le fichier app.js.
+- Cloner ce repositorie en local et l'installer avec la commande npm run install (lancer en local sur le port 3000) 
+_______________________________________________________________________________________________________________________________________________________________________
+
 
 Lancer l'application
 
