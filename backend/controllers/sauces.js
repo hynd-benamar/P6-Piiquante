@@ -2,15 +2,16 @@ const theModelsSauce = require('../models/modelsSauce');
 const fs = require('fs');
 
 exports.createSauce = (req, res, next) => {
-    const sauceObject = JSON.parse(req.body.sauce);//sauceObject = model sauce qui est ds le corps de la requete parsé
+    //sauceObject = model sauce qui est ds le corps de la requete parsé
+    const sauceObject = JSON.parse(req.body.sauce);
     delete sauceObject._id;//ce sauce object on lui supprime l'id et le userId
     delete sauceObject._userId;
     const sauce = new theModelsSauce({
-        ...sauceObject,//l'operateur spread ... sert à recup tout les données appartenant à sauceObject
+        //l'operateur spread ... sert à recup tout les données appartenant à sauceObject
+        ...sauceObject,
         userId: req.auth.userId,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
-
     sauce.save()
         .then(() => { res.status(201).json({ message: 'une nouvelle sauce a été posté !' }) })
         .catch(error => { res.status(400).json({ error }) })
@@ -21,7 +22,6 @@ exports.modifySauce = (req, res, next) => {
         ...JSON.parse(req.body.sauce),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
-
     delete sauceObject._userId;
     theModelsSauce.findOne({ _id: req.params.id })
         .then((sauce) => {
@@ -30,7 +30,8 @@ exports.modifySauce = (req, res, next) => {
             } else {
                 //on utilise la méthode updateOne() ds theModelsSauce pr maj
                 //l'objet({ dont l'_id est égal à l'id envoyé dans les parametre de la requete})
-                //le 2eme argument = la nouvelle version de l'objet {...} sert à recup l'objet sauce qui est dans le corps de la requete
+                //le 2eme argument = la nouvelle version de l'objet {...} sert à recup l'objet sauce 
+                //qui est dans le corps de la requete
                 theModelsSauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
                     .then(() => res.status(200).json({ message: 'La sauce a été modifiée !' }))
                     .catch(error => res.status(401).json({ error }));
@@ -60,16 +61,24 @@ exports.deleteSauce = (req, res, next) => {
         });
 };
 
+//ce middleware/route utilise la méthode get() pour répondre uniquement aux demandes GET
 exports.getOneSauce = (req, res, next) => {
-    //on utilise la méthode findOne() ds theModelsSauce pr trouver 
+    //on utilise la méthode findOne() ds theModelsSauce pour trouver 
     //l'objet ({ dont l'_id est égal à l'id envoyé dans les parametre de la requete})
     theModelsSauce.findOne({ _id: req.params.id })
+        //dans le then on va récupérer le tableau de tous les things retourné par la base 
+        //et on les renvoie en réponse avec un code(200) et le tableau        
         .then(sauce => res.status(200).json(sauce))
         .catch(error => res.status(404).json({ error }));
 };
 
+//cet route utilise la méthode get() pour répondre à toutes les demandes GET à cet endpoint
 exports.getAllSauce = (req, res, next) => {
+    //on utilise la méthode find() de notre modèle Mongoose pour renvoyer un tableau 
+    // qui contient toutes les sauces dans la base de données
     theModelsSauce.find()
+        //dans le then on va récupérer le tableau de tous les things retourné par la base 
+        //et on les renvoie en réponse avec un code(200) et le tableau
         .then(sauces => res.status(200).json(sauces))
         .catch(error => res.status(400).json({ error }));
 };
@@ -83,8 +92,8 @@ exports.likeSauce = (req, res, next) => {
             //dont l'id correspond à l'id des parametres de la requete
             { _id: req.params.id },
             {
-                $push: { usersLiked: req.body.userId },//https://www.mongodb.com/docs/v6.0/reference/operator/update/push/
-                $inc: { likes: +1 } //https://www.mongodb.com/docs/manual/reference/operator/update/inc/
+                $push: { usersLiked: req.body.userId },
+                $inc: { likes: +1 }
             }
         )
             .then(() => res.status(200).json({ message: 'Sauce liké !' }))
@@ -123,12 +132,6 @@ exports.likeSauce = (req, res, next) => {
             })
             .catch(error => res.status(400).json({ error }));
     }
-
-
-    //le user veut modifier son dislike en like sur une sauce
-    //il faut retrouver l id de la sauce qu'il avait disliké avec la methode findOne
-    //et la modifier avec la methode updateOne
-
     //le user veut disliker la sauce et qu'il n'avait pas liker ni disliké auparavent cette sauce
     //si dans le corps de la requete l'objet like est égal à -1
     if (req.body.like == -1) {

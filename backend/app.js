@@ -1,17 +1,18 @@
-//require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/user');
 const saucesRoutes = require('./routes/sauces');
 const path = require('path');
+const helmet = require('helmet');
 const app = express();
+require('dotenv').config();
 //Avec ceci, Express prend toutes les requêtes qui ont comme Content-Type application/json et met à disposition 
 //leur body directement sur l'objet req, ce qui nous permet d'écrire le middleware POST
 app.use(express.json());
 
 //connexion à Mongodb 
 mongoose.connect(
-    "mongodb+srv://hyndB:0128databases@cluster1-base2donnesnos.c4i8a4d.mongodb.net/?retryWrites=true&w=majority",
+    process.env.SECRET_BDD,
     { useNewUrlParser: true, useUnifiedTopology: true }
 )
     .then(() => console.log("Connexion à MongoDB réussie !"))
@@ -29,9 +30,12 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use(helmet.xssFilter());
 //Gère la ressource "images" de manière statique à chaque fois qu'elle reçoit une requête vers la route "/images"
 app.use('/images', express.static(path.join(__dirname, 'images')));
+
 app.use('/api/sauces', saucesRoutes);//route sauce
 app.use('/api/auth', userRoutes);//route authentification
-
 module.exports = app;
+

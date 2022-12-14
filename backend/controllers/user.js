@@ -7,8 +7,10 @@ const User = require('../models/user')
 //middleware d'authentifications
 //creation de nouveaux users ds la base de données
 exports.signup = (req, res, next) => {
-    bcrypt.hash(req.body.password, 10)
+    //hasher le mdp avant de l'envoyer dans la BDD
+    bcrypt.hash(req.body.password, 10)//salt = 10 combien de fois sera execute l'algorithme de hashage
         .then(hash => {
+            //ce qui va être enregister ds MongoDB
             const user = new User({
                 email: req.body.email,
                 password: hash
